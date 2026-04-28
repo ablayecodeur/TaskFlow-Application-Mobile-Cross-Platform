@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import NetInfo from '@react-native-community/netinfo';
 import { AppState, AppStateStatus } from 'react-native';
+import * as Network from 'expo-network';
 import { runSync, scheduleSync } from '../sync/syncEngine';
 import { useAuthStore } from '../store/authStore';
 import { useTaskStore } from '../store/taskStore';
@@ -10,6 +10,7 @@ export function useSync() {
   const userId = useAuthStore((s) => s.user?.id);
   const isSyncing = useTaskStore((s) => s.isSyncing);
   const lastSyncRef = useRef<Date | null>(null);
+  const wasOfflineRef = useRef(false);
 
   const sync = useCallback(async () => {
     if (!userId || isSyncing) return;
@@ -26,35 +27,30 @@ export function useSync() {
         );
       }
     } catch {
-      // Silently fail — will retry on next trigger
+      // Silently fail — retry on next trigger
     }
   }, [userId, isSyncing]);
 
-  // Sync on network reconnect
+  // Detect network reconnect by polling on AppState change (Expo Go compatible)
   useEffect(() => {
     if (!userId) return;
 
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      if (state.isConnected && state.isInternetReachable) {
-        scheduleSync(userId, 2000);
+    const handleAppState = async (next: AppStateStatus) => {
+      if (next !== 'active') return;
+
+      const state = await Network.getNetworkStateAsync();
+      const isNowOnline = state.isConnected === true && state.isInternetReachable !== false;
+
+      const lastSync = lastSyncRef.current;
+      const fiveMinutes = 5 * 60 * 1000;
+      const stale = !lastSync || Date.now() - lastSync.getTime() > fiveMinutes;
+
+      // Trigger if back online after being offline, or stale
+      if ((wasOfflineRef.current && isNowOnline) || stale) {
+        scheduleSync(userId, 1000);
       }
-    });
 
-    return unsubscribe;
-  }, [userId]);
-
-  // Sync on app foreground
-  useEffect(() => {
-    if (!userId) return;
-
-    const handleAppState = (next: AppStateStatus) => {
-      if (next === 'active') {
-        const lastSync = lastSyncRef.current;
-        const fiveMinutes = 5 * 60 * 1000;
-        if (!lastSync || Date.now() - lastSync.getTime() > fiveMinutes) {
-          scheduleSync(userId, 1000);
-        }
-      }
+      wasOfflineRef.current = !isNowOnline;
     };
 
     const sub = AppState.addEventListener('change', handleAppState);

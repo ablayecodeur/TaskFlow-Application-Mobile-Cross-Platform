@@ -45,11 +45,16 @@ export async function registerForPushNotifications(): Promise<string | null> {
     });
   }
 
+  // Push tokens require a real EAS projectId — unavailable in Expo Go.
+  // Local notifications (scheduleNotificationAsync) work fine in Expo Go.
   const projectId =
     Constants.expoConfig?.extra?.eas?.projectId ??
     Constants.easConfig?.projectId;
 
-  if (!projectId) return null;
+  if (!projectId) {
+    console.warn('[Notifications] No EAS projectId — push tokens disabled (Expo Go mode)');
+    return null;
+  }
 
   try {
     const token = await Notifications.getExpoPushTokenAsync({ projectId });

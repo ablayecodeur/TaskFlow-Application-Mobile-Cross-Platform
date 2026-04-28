@@ -1,4 +1,4 @@
-import NetInfo from '@react-native-community/netinfo';
+import * as Network from 'expo-network';
 import {
   getPendingTasks,
   markTaskSynced,
@@ -19,7 +19,7 @@ let _syncTimer: ReturnType<typeof setTimeout> | null = null;
 let _isSyncing = false;
 
 export async function isOnline(): Promise<boolean> {
-  const state = await NetInfo.fetch();
+  const state = await Network.getNetworkStateAsync();
   return state.isConnected === true && state.isInternetReachable !== false;
 }
 
