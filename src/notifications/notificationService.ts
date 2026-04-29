@@ -80,10 +80,7 @@ export async function scheduleTaskDueNotification(task: Task): Promise<string | 
       sound: 'default',
       categoryIdentifier: 'task_reminder',
     },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date: reminderDate,
-    },
+    trigger: { date: reminderDate },
   });
 
   return id;
@@ -97,11 +94,7 @@ export async function scheduleDailyDigest(hour = 8, minute = 0): Promise<string>
       data: { type: 'daily_digest' },
       sound: 'default',
     },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour,
-      minute,
-    },
+    trigger: { hour, minute, repeats: true },
   });
 }
 

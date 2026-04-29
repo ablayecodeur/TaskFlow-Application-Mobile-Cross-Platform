@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/authStore';
-import { useTaskStore, selectFilteredTasks } from '../../src/store/taskStore';
+import { useTaskStore } from '../../src/store/taskStore';
 import { TaskCard } from '../../src/components/common/TaskCard';
 import { SyncIndicator } from '../../src/components/common/SyncIndicator';
 import { Input } from '../../src/components/ui/Input';
@@ -39,12 +39,25 @@ const PRIORITIES: TaskPriority[] = ['low', 'medium', 'high', 'urgent'];
 export default function TasksScreen() {
   const { user } = useAuthStore();
   const {
-    isLoading, isSyncing, filter, searchQuery,
+    tasks, isLoading, isSyncing, filter, searchQuery,
     loadTasks, addTask, toggleComplete, removeTask,
     setFilter, setSearchQuery,
   } = useTaskStore();
 
-  const filteredTasks = useTaskStore(selectFilteredTasks);
+  const filteredTasks = useMemo(() => {
+    let result = tasks.filter((t) => t.syncStatus !== 'pending_delete');
+    if (filter !== 'all') result = result.filter((t) => t.status === filter);
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          t.description?.toLowerCase().includes(q) ||
+          t.tags.some((tag) => tag.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }, [tasks, filter, searchQuery]);
 
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
