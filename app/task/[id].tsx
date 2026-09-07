@@ -41,7 +41,7 @@ export default function TaskDetailScreen() {
   const task = tasks.find((t) => t.id === id) ?? null;
 
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState<UpdateTaskPayload & { tags: string }>({
+  const [form, setForm] = useState<Omit<UpdateTaskPayload, 'tags'> & { tags: string }>({
     title: '',
     description: '',
     priority: 'medium',

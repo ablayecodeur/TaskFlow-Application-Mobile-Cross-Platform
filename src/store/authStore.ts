@@ -1,12 +1,12 @@
 import { create } from 'zustand';
-import { User, AuthTokens } from '../types';
+import { User, AuthTokens, LoginCredentials, RegisterCredentials } from '../types';
 import {
   saveUser,
   getStoredUser,
   deleteUser,
   updateTokens,
 } from '../db/repositories/userRepository';
-import { loginApi, registerApi, logoutApi, LoginCredentials, RegisterCredentials } from '../api/auth';
+import { loginApi, registerApi, logoutApi } from '../api/auth';
 
 interface AuthStore {
   user: User | null;
