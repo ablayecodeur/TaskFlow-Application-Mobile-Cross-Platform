@@ -123,12 +123,12 @@ export async function setBadgeCount(count: number): Promise<void> {
 
 export function addNotificationResponseListener(
   handler: (response: Notifications.NotificationResponse) => void
-): Notifications.EventSubscription {
+): Notifications.Subscription {
   return Notifications.addNotificationResponseReceivedListener(handler);
 }
 
 export function addNotificationReceivedListener(
   handler: (notification: Notifications.Notification) => void
-): Notifications.EventSubscription {
+): Notifications.Subscription {
   return Notifications.addNotificationReceivedListener(handler);
 }

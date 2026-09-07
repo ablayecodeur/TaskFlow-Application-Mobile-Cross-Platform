@@ -67,10 +67,11 @@ export function TaskCard({ task, onPress, onToggleComplete, onDelete }: TaskCard
   };
 
   const isCompleted = task.status === 'completed';
-  const isOverdue =
+  const isOverdue = Boolean(
     task.dueDate &&
     new Date(task.dueDate) < new Date() &&
-    !isCompleted;
+    !isCompleted
+  );
 
   return (
     <Animated.View style={[styles.wrapper, cardStyle]}>
