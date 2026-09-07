@@ -146,7 +146,7 @@ REST API  ──── markTaskSynced() ──► sync_status = synced
 ## Structure du projet
 
 ```
-app-multi-plateforme/
+TaskFlow-Application-Mobile-Cross-Platform/
 │
 ├── app/                          # Expo Router — écrans
 │   ├── _layout.tsx               # Root layout (splash, auth init)
@@ -231,8 +231,8 @@ app-multi-plateforme/
 ### Cloner et installer
 
 ```bash
-git clone https://github.com/ablayecodeur/app-multi-plateforme.git
-cd app-multi-plateforme
+git clone https://github.com/ablayecodeur/TaskFlow-Application-Mobile-Cross-Platform.git
+cd TaskFlow-Application-Mobile-Cross-Platform
 
 cp .env.example .env
 npm install --legacy-peer-deps
